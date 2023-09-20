@@ -64968,15 +64968,11 @@ function postSuiMessageToWallet(methodName, id, data) {
     'id': id,
     'object': data
   };
-  console.log(JSON.stringify(params));
   if (window.flutter_inappwebview) {
-    console.log('Flutter浏览器');
     window.flutter_inappwebview.callHandler('web3Message', params);
   } else if (window.webkit) {
-    console.log('iOS浏览器');
     window.webkit.messageHandlers.web3Message.postMessage(params);
   } else if (window.gateio) {
-    console.log('android浏览器');
     window.gateio.web3Message(params);
   }
 }
@@ -65010,6 +65006,8 @@ var MESSAGE_TYPE_GET_ACCOUNT = "get-account";
 var MESSAGE_TYPE_GET_NETWORK = "get-network";
 var MESSAGE_TYPE_QREDO_CONNECT = "qredo-connect";
 
+var suiAccountInfo = [];
+
 var GateSuiWallet = function () {
   function GateSuiWallet() {
     _classCallCheck(this, GateSuiWallet);
@@ -65032,9 +65030,13 @@ var GateSuiWallet = function () {
 
               case 3:
                 res = _context.sent;
-                return _context.abrupt('return', []);
 
-              case 5:
+                suiAccountInfo = res['accounts'];
+                return _context.abrupt('return', {
+                  accounts: suiAccountInfo
+                });
+
+              case 6:
               case 'end':
                 return _context.stop();
             }
@@ -65106,10 +65108,7 @@ var GateSuiWallet = function () {
   }, {
     key: 'accounts',
     get: function get() {
-      return [{
-        "address": "0x5bc852f1ca0b36b22ccaab5a859bcb26afa5527aef5638088c2bd841201d2310",
-        "publicKey": ""
-      }];
+      return suiAccountInfo;
     }
   }, {
     key: 'features',
@@ -65150,7 +65149,8 @@ var GateSuiWallet = function () {
   return GateSuiWallet;
 }();
 
-(0, _walletStandard.registerWallet)(new GateSuiWallet());
+var wallet = new GateSuiWallet();
+(0, _walletStandard.registerWallet)(wallet);
 
 module.exports = AlphaWallet;
 

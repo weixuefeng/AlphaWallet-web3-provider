@@ -216,15 +216,11 @@ function postSuiMessageToWallet(methodName, id, data) {
       'id': id,
       'object': data,
   }
-  console.log(JSON.stringify(params))
   if (window.flutter_inappwebview) {
-      console.log('Flutter浏览器')
       window.flutter_inappwebview.callHandler('web3Message', params)
   } else if (window.webkit) {
-      console.log('iOS浏览器')
       window.webkit.messageHandlers.web3Message.postMessage(params)
   } else if (window.gateio) {
-      console.log('android浏览器')
       window.gateio.web3Message(params)
   }
 }
@@ -259,6 +255,8 @@ const MESSAGE_TYPE_GET_ACCOUNT = "get-account";
 const MESSAGE_TYPE_GET_NETWORK = "get-network";
 const MESSAGE_TYPE_QREDO_CONNECT = "qredo-connect";
 
+var suiAccountInfo = []
+
 class GateSuiWallet {
   
   get version() { return "1.0.0"; }
@@ -272,10 +270,7 @@ class GateSuiWallet {
   }
 
   get accounts() {
-    return [{
-      "address":"0x5bc852f1ca0b36b22ccaab5a859bcb26afa5527aef5638088c2bd841201d2310",
-      "publicKey": ""
-    }]
+    return suiAccountInfo
   }
 
   get features() {
@@ -319,7 +314,10 @@ class GateSuiWallet {
       ],
     }, MESSAGE_TYPE_ACQUIRE_PERMISSION)
     var res = await request(msg)
-    return []
+    suiAccountInfo = res['accounts']
+    return {
+      accounts: suiAccountInfo
+    }
   }
 
   on(input) {
@@ -350,9 +348,11 @@ class GateSuiWallet {
     var msg = createMessage(input, MESSAGE_TYPE_QREDO_CONNECT)
     return request(msg)
   }
+
 }
 
-registerWallet(new GateSuiWallet());
+var wallet = new GateSuiWallet()
+registerWallet(wallet);
 
 
 module.exports = AlphaWallet
