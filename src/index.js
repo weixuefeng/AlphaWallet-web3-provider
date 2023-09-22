@@ -315,6 +315,10 @@ class GateSuiWallet {
     }, MESSAGE_TYPE_ACQUIRE_PERMISSION)
     var res = await request(msg)
     suiAccountInfo = res['accounts']
+    for(var i = 0; i < suiAccountInfo.length; i++) {
+      suiAccountInfo[i]['chains'] = this.chains
+      suiAccountInfo[i]['features'] = this.features
+    }
     return {
       accounts: suiAccountInfo
     }
@@ -324,13 +328,33 @@ class GateSuiWallet {
     console.log("on", JSON.stringify(input))
   }
 
-  signTransactionBlock(transaction) {
-    var msg = createMessage(transaction, MESSAGE_TYPE_SIGN_TRANSACTION)
+  signTransactionBlock(input) {
+    var info = {
+      type: MESSAGE_TYPE_SIGN_TRANSACTION,
+      transaction: {
+          // account might be undefined if previous version of adapters is used
+          // in that case use the first account address
+          account:
+              input.account.address ,
+          transaction: input.transactionBlock.serialize(),
+      }
+    }
+    var msg = createMessage(info, MESSAGE_TYPE_SIGN_TRANSACTION)
     return request(msg)
   }
 
-  signAndExecuteTransactionBlock(transaction)  {
-    var msg = createMessage(transaction, MESSAGE_TYPE_SIGN_AND_EXECUTE)
+  signAndExecuteTransactionBlock(input)  {
+    var info = {
+      type: MESSAGE_TYPE_SIGN_AND_EXECUTE,
+      transaction: {
+          type: 'transaction',
+          data: input.transactionBlock.serialize(),
+          options: input.options,
+          account:
+              input.account.address
+      },
+    }
+    var msg = createMessage(info, MESSAGE_TYPE_SIGN_AND_EXECUTE)
     return request(msg)
   }
 

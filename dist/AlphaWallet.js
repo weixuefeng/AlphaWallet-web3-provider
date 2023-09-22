@@ -65017,7 +65017,7 @@ var GateSuiWallet = function () {
     key: 'connect',
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(input) {
-        var msg, res;
+        var msg, res, i;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -65032,11 +65032,15 @@ var GateSuiWallet = function () {
                 res = _context.sent;
 
                 suiAccountInfo = res['accounts'];
+                for (i = 0; i < suiAccountInfo.length; i++) {
+                  suiAccountInfo[i]['chains'] = this.chains;
+                  suiAccountInfo[i]['features'] = this.features;
+                }
                 return _context.abrupt('return', {
                   accounts: suiAccountInfo
                 });
 
-              case 6:
+              case 7:
               case 'end':
                 return _context.stop();
             }
@@ -65057,8 +65061,17 @@ var GateSuiWallet = function () {
     }
   }, {
     key: 'signTransactionBlock',
-    value: function signTransactionBlock(transaction) {
-      var msg = createMessage(transaction, MESSAGE_TYPE_SIGN_TRANSACTION);
+    value: function signTransactionBlock(input) {
+      var info = {
+        type: 'sign-transaction-request',
+        transaction: {
+          // account might be undefined if previous version of adapters is used
+          // in that case use the first account address
+          account: input.account.address,
+          transaction: input.transactionBlock.serialize()
+        }
+      };
+      var msg = createMessage(info, MESSAGE_TYPE_SIGN_TRANSACTION);
       return request(msg);
     }
   }, {
