@@ -12,11 +12,14 @@ const context = window || global
 context.chrome = { webstore: true }
 context.Web3 = Web3
 
-let callbacks = {}
+let callbacks
 let hookedSubProvider
 let globalSyncOptions = {}
-
+if (typeof context.GateEVMWallet === 'undefined') {
+  callbacks = {}
+}
 const GateEVMWallet = {
+  
   init (rpcUrl, options, syncOptions) { 
     const engine = new ProviderEngine()
     const web3 = new Web3(engine)
@@ -371,8 +374,10 @@ class GateSuiWallet {
 }
 
 var suiWallet = new GateSuiWallet()
-registerWallet(suiWallet);
-
+if(!window['suiWallet']) {
+  window['suiWallet'] = suiWallet
+  registerWallet(suiWallet);
+}
 
 // --- sei wallet
 // sei-js/ packages/core/src/lib/wallet/connect.ts
@@ -420,7 +425,8 @@ class GateSeiWallet  {
     console.log("getOfflineSignerAuto: ", chainId)
     return {
       async getAccounts() {
-        return this.getAccounts
+        var msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS)
+        return request(msg);
       },
       async signDirect(signerAddress, signDoc) {
         var info = {
@@ -436,9 +442,9 @@ class GateSeiWallet  {
     var msg = createMessage({
       chainId: chainId,
     }, MESSAGE_TYPE_SEI_ENABLE)
+
     var res = await request(msg)
-    console.log(res);
-    return true
+    return res['result']
   }
 
   async disable(chainId) {
@@ -449,9 +455,7 @@ class GateSeiWallet  {
 }
 
 var seiWallet = new GateSeiWallet()
-window['keplr'] = seiWallet
-
-
-
-
+if(!window['keplr']) {
+  window['keplr'] = seiWallet
+}
 module.exports = GateEVMWallet

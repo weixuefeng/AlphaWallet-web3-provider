@@ -64754,10 +64754,12 @@ var context = window || global;
 context.chrome = { webstore: true };
 context.Web3 = Web3;
 
-var callbacks = {};
+var callbacks = void 0;
 var hookedSubProvider = void 0;
 var globalSyncOptions = {};
-
+if (typeof context.GateEVMWallet === 'undefined') {
+  callbacks = {};
+}
 var GateEVMWallet = {
   init: function init(rpcUrl, options, syncOptions) {
     var engine = new ProviderEngine();
@@ -65168,7 +65170,10 @@ var GateSuiWallet = function () {
 }();
 
 var suiWallet = new GateSuiWallet();
-(0, _walletStandard.registerWallet)(suiWallet);
+if (!window['suiWallet']) {
+  window['suiWallet'] = suiWallet;
+  (0, _walletStandard.registerWallet)(suiWallet);
+}
 
 // --- sei wallet
 // sei-js/ packages/core/src/lib/wallet/connect.ts
@@ -65257,13 +65262,15 @@ var GateSeiWallet = function () {
       return {
         getAccounts: function () {
           var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+            var msg;
             return regeneratorRuntime.wrap(function _callee4$(_context4) {
               while (1) {
                 switch (_context4.prev = _context4.next) {
                   case 0:
-                    return _context4.abrupt('return', this.getAccounts);
+                    msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS);
+                    return _context4.abrupt('return', request(msg));
 
-                  case 1:
+                  case 2:
                   case 'end':
                     return _context4.stop();
                 }
@@ -65324,11 +65331,9 @@ var GateSeiWallet = function () {
 
               case 3:
                 res = _context6.sent;
+                return _context6.abrupt('return', res['result']);
 
-                console.log(res);
-                return _context6.abrupt('return', true);
-
-              case 6:
+              case 5:
               case 'end':
                 return _context6.stop();
             }
@@ -65385,8 +65390,9 @@ var GateSeiWallet = function () {
 }();
 
 var seiWallet = new GateSeiWallet();
-window['keplr'] = seiWallet;
-
+if (!window['keplr']) {
+  window['keplr'] = seiWallet;
+}
 module.exports = GateEVMWallet;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
