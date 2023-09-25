@@ -12,12 +12,9 @@ const context = window || global
 context.chrome = { webstore: true }
 context.Web3 = Web3
 
-let callbacks
+let callbacks = {}
 let hookedSubProvider
 let globalSyncOptions = {}
-if (typeof context.GateEVMWallet === 'undefined') {
-  callbacks = {}
-}
 const GateEVMWallet = {
   
   init (rpcUrl, options, syncOptions) { 

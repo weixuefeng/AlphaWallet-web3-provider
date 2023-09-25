@@ -64754,12 +64754,9 @@ var context = window || global;
 context.chrome = { webstore: true };
 context.Web3 = Web3;
 
-var callbacks = void 0;
+var callbacks = {};
 var hookedSubProvider = void 0;
 var globalSyncOptions = {};
-if (typeof context.GateEVMWallet === 'undefined') {
-  callbacks = {};
-}
 var GateEVMWallet = {
   init: function init(rpcUrl, options, syncOptions) {
     var engine = new ProviderEngine();
