@@ -64749,7 +64749,6 @@ var Web3Subprovider = require("web3-provider-engine/subproviders/provider.js");
 var CacheSubprovider = require('web3-provider-engine/subproviders/cache.js');
 var SubscriptionsSubprovider = require('web3-provider-engine/subproviders/subscriptions.js');
 
-
 var context = window || global;
 
 context.chrome = { webstore: true };
@@ -64759,7 +64758,7 @@ var callbacks = {};
 var hookedSubProvider = void 0;
 var globalSyncOptions = {};
 
-var AlphaWallet = {
+var GateEVMWallet = {
   init: function init(rpcUrl, options, syncOptions) {
     var engine = new ProviderEngine();
     var web3 = new Web3(engine);
@@ -64800,7 +64799,7 @@ var AlphaWallet = {
     });
     engine.enable = options.enable;
     engine.chainId = syncOptions.networkVersion;
-    engine.isAlphaWallet = true;
+    engine.GateEVMWallet = true;
     engine.start();
 
     return engine;
@@ -64811,10 +64810,7 @@ var AlphaWallet = {
   },
   executeCallback: function executeCallback(id, error, value) {
     var callback = callbacks[id];
-
-    console.log('executing callback isRpc:' + callback.isRPC + ': \nid: ' + id + '\nvalue: ' + value + '\nerror: ' + error + ',\n');
-
-    if (callback.isRPC) {
+    if (callback && callback.isRPC) {
       var response;
       if (obj instanceof Object && !(obj instanceof Array)) {
         response = { 'id': id, jsonrpc: '2.0', result: value, error: error };
@@ -64835,8 +64831,8 @@ var AlphaWallet = {
   }
 };
 
-if (typeof context.AlphaWallet === 'undefined') {
-  context.AlphaWallet = AlphaWallet;
+if (typeof context.GateEVMWallet === 'undefined') {
+  context.GateEVMWallet = GateEVMWallet;
 }
 
 ProviderEngine.prototype.setHost = function (host) {
@@ -64881,7 +64877,7 @@ ProviderEngine.prototype.send = function (payload) {
 
     // throw not-supported Error
     default:
-      var message = 'The AlphaWallet Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter.';
+      var message = 'The GateEVMWallet Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter.';
       throw new Error(message);
   }
   // return the result
@@ -64978,7 +64974,7 @@ function postSuiMessageToWallet(methodName, id, data) {
 }
 
 function sendAsync(msg, cb) {
-  AlphaWallet.addCallback(msg.id, cb);
+  GateEVMWallet.addCallback(msg.id, cb);
   postSuiMessageToWallet(msg.method, msg.id, msg.payload);
 }
 
@@ -65063,7 +65059,7 @@ var GateSuiWallet = function () {
     key: 'signTransactionBlock',
     value: function signTransactionBlock(input) {
       var info = {
-        type: 'sign-transaction-request',
+        type: MESSAGE_TYPE_SIGN_TRANSACTION,
         transaction: {
           // account might be undefined if previous version of adapters is used
           // in that case use the first account address
@@ -65076,8 +65072,17 @@ var GateSuiWallet = function () {
     }
   }, {
     key: 'signAndExecuteTransactionBlock',
-    value: function signAndExecuteTransactionBlock(transaction) {
-      var msg = createMessage(transaction, MESSAGE_TYPE_SIGN_AND_EXECUTE);
+    value: function signAndExecuteTransactionBlock(input) {
+      var info = {
+        type: MESSAGE_TYPE_SIGN_AND_EXECUTE,
+        transaction: {
+          type: 'transaction',
+          data: input.transactionBlock.serialize(),
+          options: input.options,
+          account: input.account.address
+        }
+      };
+      var msg = createMessage(info, MESSAGE_TYPE_SIGN_AND_EXECUTE);
       return request(msg);
     }
   }, {
@@ -65162,10 +65167,227 @@ var GateSuiWallet = function () {
   return GateSuiWallet;
 }();
 
-var wallet = new GateSuiWallet();
-(0, _walletStandard.registerWallet)(wallet);
+var suiWallet = new GateSuiWallet();
+(0, _walletStandard.registerWallet)(suiWallet);
 
-module.exports = AlphaWallet;
+// --- sei wallet
+// sei-js/ packages/core/src/lib/wallet/connect.ts
+var MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
+var MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
+var MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitray";
+var MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
+var MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
+var MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
+
+var GateSeiWallet = function () {
+  function GateSeiWallet() {
+    _classCallCheck(this, GateSeiWallet);
+  }
+
+  _createClass(GateSeiWallet, [{
+    key: 'getAccounts',
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(chainId) {
+        var msg;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                console.log("getAccounts: ", chainId);
+                msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS);
+                return _context2.abrupt('return', request(msg));
+
+              case 3:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function getAccounts(_x2) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return getAccounts;
+    }()
+  }, {
+    key: 'connect',
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(chainId) {
+        var msg;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                console.log("connect: ", chainId);
+                msg = createMessage(chainId, MESSAGE_TYPE_SEI_CONNECT);
+                return _context3.abrupt('return', request(msg));
+
+              case 3:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function connect(_x3) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return connect;
+    }()
+  }, {
+    key: 'signArbitray',
+    value: function signArbitray(chainId, signer, message) {
+      console.log("signArbitray: ", chainId);
+      var info = {
+        "chainId": chainId,
+        "signer": signer,
+        "message": message
+      };
+      var msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNARBITRAY);
+      return request(msg);
+    }
+  }, {
+    key: 'getOfflineSignerAuto',
+    value: function getOfflineSignerAuto(chainId) {
+      console.log("getOfflineSignerAuto: ", chainId);
+      return {
+        getAccounts: function () {
+          var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+            return regeneratorRuntime.wrap(function _callee4$(_context4) {
+              while (1) {
+                switch (_context4.prev = _context4.next) {
+                  case 0:
+                    return _context4.abrupt('return', this.getAccounts);
+
+                  case 1:
+                  case 'end':
+                    return _context4.stop();
+                }
+              }
+            }, _callee4, this);
+          }));
+
+          function getAccounts() {
+            return _ref4.apply(this, arguments);
+          }
+
+          return getAccounts;
+        }(),
+        signDirect: function () {
+          var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(signerAddress, signDoc) {
+            var info, msg;
+            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+              while (1) {
+                switch (_context5.prev = _context5.next) {
+                  case 0:
+                    info = {
+                      "signerAddress": signerAddress,
+                      "signDoc": signDoc
+                    };
+                    msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNDIRECT);
+                    return _context5.abrupt('return', request(msg));
+
+                  case 3:
+                  case 'end':
+                    return _context5.stop();
+                }
+              }
+            }, _callee5, this);
+          }));
+
+          function signDirect(_x4, _x5) {
+            return _ref5.apply(this, arguments);
+          }
+
+          return signDirect;
+        }()
+      };
+    }
+  }, {
+    key: 'enable',
+    value: function () {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(chainId) {
+        var msg, res;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                msg = createMessage({
+                  chainId: chainId
+                }, MESSAGE_TYPE_SEI_ENABLE);
+                _context6.next = 3;
+                return request(msg);
+
+              case 3:
+                res = _context6.sent;
+
+                console.log(res);
+                return _context6.abrupt('return', true);
+
+              case 6:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function enable(_x6) {
+        return _ref6.apply(this, arguments);
+      }
+
+      return enable;
+    }()
+  }, {
+    key: 'disable',
+    value: function () {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(chainId) {
+        var msg;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                console.log("disable: ", chainId);
+                msg = createMessage(chainId, MESSAGE_TYPE_SEI_DISABLE);
+                return _context7.abrupt('return', request(msg));
+
+              case 3:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function disable(_x7) {
+        return _ref7.apply(this, arguments);
+      }
+
+      return disable;
+    }()
+  }, {
+    key: 'walletInfo',
+    get: function get() {
+      return {
+        windowKey: 'keplr',
+        name: 'GateWallet',
+        website: 'https://gate.io',
+        icon: 'https://www.gate.io/images/logo/open_sesame_light.png?v=4'
+      };
+    }
+  }]);
+
+  return GateSeiWallet;
+}();
+
+var seiWallet = new GateSeiWallet();
+window['keplr'] = seiWallet;
+
+module.exports = GateEVMWallet;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"@mysten/wallet-standard":1,"regenerator-runtime/runtime":340,"web3":380,"web3-provider-engine":366,"web3-provider-engine/subproviders/cache.js":367,"web3-provider-engine/subproviders/filters.js":368,"web3-provider-engine/subproviders/hooked-wallet.js":369,"web3-provider-engine/subproviders/provider.js":370,"web3-provider-engine/subproviders/subscriptions.js":372}]},{},[432]);

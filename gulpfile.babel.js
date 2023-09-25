@@ -7,7 +7,7 @@ const gulp            = require('gulp'),
       size            = require('gulp-size'),
       source          = require('vinyl-source-stream'),
       config = {
-          name: 'AlphaWallet',
+          name: 'GateEVMWallet',
           fileTypes: {
             all: '**/*',
             js: '**/*.js',

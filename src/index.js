@@ -7,7 +7,6 @@ const CacheSubprovider = require('web3-provider-engine/subproviders/cache.js')
 const SubscriptionsSubprovider = require('web3-provider-engine/subproviders/subscriptions.js')
 import { registerWallet, SUI_CHAINS } from "@mysten/wallet-standard";
 import "regenerator-runtime/runtime";
-
 const context = window || global
 
 context.chrome = { webstore: true }
@@ -17,7 +16,7 @@ let callbacks = {}
 let hookedSubProvider
 let globalSyncOptions = {}
 
-const AlphaWallet = {
+const GateEVMWallet = {
   init (rpcUrl, options, syncOptions) { 
     const engine = new ProviderEngine()
     const web3 = new Web3(engine)
@@ -50,7 +49,7 @@ const AlphaWallet = {
     engine.on('error', err => console.error(err.stack))
     engine.enable = options.enable
     engine.chainId = syncOptions.networkVersion
-    engine.isAlphaWallet = true
+    engine.GateEVMWallet = true
     engine.start()
 
     return engine
@@ -59,13 +58,10 @@ const AlphaWallet = {
     cb.isRPC = isRPC
     callbacks[id] = cb
   },
+
   executeCallback (id, error, value) {
     let callback = callbacks[id]
-
-    console.log(`executing callback isRpc:${callback.isRPC}: \nid: ${id}\nvalue: ${value}\nerror: ${error},\n`)
-
-
-    if (callback.isRPC) {
+    if (callback && callback.isRPC) {
       var response
       if (obj instanceof Object && !(obj instanceof Array)) {
         response = {'id': id, jsonrpc: '2.0', result: value, error: error }
@@ -86,8 +82,8 @@ const AlphaWallet = {
   }
 }
 
-if (typeof context.AlphaWallet === 'undefined') {
-  context.AlphaWallet = AlphaWallet
+if (typeof context.GateEVMWallet === 'undefined') {
+  context.GateEVMWallet = GateEVMWallet
 }
 
 ProviderEngine.prototype.setHost = function (host) {
@@ -130,7 +126,7 @@ ProviderEngine.prototype.send = function (payload) {
 
     // throw not-supported Error
     default:
-      var message = `The AlphaWallet Web3 object does not support synchronous methods like ${payload.method} without a callback parameter.`
+      var message = `The GateEVMWallet Web3 object does not support synchronous methods like ${payload.method} without a callback parameter.`
       throw new Error(message)
   }
   // return the result
@@ -226,7 +222,7 @@ function postSuiMessageToWallet(methodName, id, data) {
 }
 
 function sendAsync (msg, cb) {
-  AlphaWallet.addCallback(msg.id, cb)
+  GateEVMWallet.addCallback(msg.id, cb)
   postSuiMessageToWallet(msg.method, msg.id, msg.payload)
 }
 
@@ -372,11 +368,90 @@ class GateSuiWallet {
     var msg = createMessage(input, MESSAGE_TYPE_QREDO_CONNECT)
     return request(msg)
   }
-
 }
 
-var wallet = new GateSuiWallet()
-registerWallet(wallet);
+var suiWallet = new GateSuiWallet()
+registerWallet(suiWallet);
 
 
-module.exports = AlphaWallet
+// --- sei wallet
+// sei-js/ packages/core/src/lib/wallet/connect.ts
+const MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
+const MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
+const MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitray";
+const MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
+const MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
+const MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
+
+class GateSeiWallet  {
+  get walletInfo() {
+    return {
+      windowKey: 'keplr',
+      name: 'GateWallet',
+      website: 'https://gate.io',
+      icon: 'https://www.gate.io/images/logo/open_sesame_light.png?v=4'
+    }
+  }
+
+  async getAccounts(chainId)  {
+    console.log("getAccounts: ", chainId)
+    var msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS)
+    return request(msg);
+  }
+
+  async connect(chainId) {
+    console.log("connect: ", chainId)
+    var msg = createMessage(chainId, MESSAGE_TYPE_SEI_CONNECT)
+    return request(msg);
+  }
+
+  signArbitray(chainId, signer, message) {
+    console.log("signArbitray: ", chainId)
+    var info = {
+      "chainId": chainId,
+      "signer": signer,
+      "message": message
+    }
+    var msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNARBITRAY)
+    return request(msg);
+  }
+
+  getOfflineSignerAuto(chainId) {
+    console.log("getOfflineSignerAuto: ", chainId)
+    return {
+      async getAccounts() {
+        return this.getAccounts
+      },
+      async signDirect(signerAddress, signDoc) {
+        var info = {
+          "signerAddress": signerAddress,
+          "signDoc": signDoc,
+        }
+        var msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNDIRECT)
+        return request(msg)
+      }
+    }
+  }
+  async enable(chainId) {
+    var msg = createMessage({
+      chainId: chainId,
+    }, MESSAGE_TYPE_SEI_ENABLE)
+    var res = await request(msg)
+    console.log(res);
+    return true
+  }
+
+  async disable(chainId) {
+    console.log("disable: ", chainId)
+    var msg = createMessage(chainId, MESSAGE_TYPE_SEI_DISABLE)
+    return request(msg);
+  }
+}
+
+var seiWallet = new GateSeiWallet()
+window['keplr'] = seiWallet
+
+
+
+
+module.exports = GateEVMWallet
