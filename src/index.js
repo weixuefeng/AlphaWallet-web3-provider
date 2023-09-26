@@ -431,7 +431,12 @@ class GateSeiWallet  {
           "signDoc": signDoc,
         }
         var msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNDIRECT)
-        return request(msg)
+        var result = await request(msg)
+        var info = {
+          signed: signDoc,
+          signature: result['signature']
+        }
+        return info;
       }
     }
   }

@@ -65283,7 +65283,7 @@ var GateSeiWallet = function () {
         }(),
         signDirect: function () {
           var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(signerAddress, signDoc) {
-            var info, msg;
+            var info, msg, result;
             return regeneratorRuntime.wrap(function _callee5$(_context5) {
               while (1) {
                 switch (_context5.prev = _context5.next) {
@@ -65293,9 +65293,18 @@ var GateSeiWallet = function () {
                       "signDoc": signDoc
                     };
                     msg = createMessage(info, MESSAGE_TYPE_SEI_SIGNDIRECT);
-                    return _context5.abrupt('return', request(msg));
+                    _context5.next = 4;
+                    return request(msg);
 
-                  case 3:
+                  case 4:
+                    result = _context5.sent;
+                    info = {
+                      signed: signDoc,
+                      signature: result['signature']
+                    };
+                    return _context5.abrupt('return', info);
+
+                  case 7:
                   case 'end':
                     return _context5.stop();
                 }
