@@ -65176,7 +65176,7 @@ if (!window['suiWallet']) {
 // sei-js/ packages/core/src/lib/wallet/connect.ts
 var MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
 var MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
-var MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitray";
+var MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitrary";
 var MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
 var MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
 var MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
@@ -65195,11 +65195,10 @@ var GateSeiWallet = function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                console.log("getAccounts: ", chainId);
                 msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS);
                 return _context2.abrupt('return', request(msg));
 
-              case 3:
+              case 2:
               case 'end':
                 return _context2.stop();
             }
@@ -65222,11 +65221,10 @@ var GateSeiWallet = function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                console.log("connect: ", chainId);
                 msg = createMessage(chainId, MESSAGE_TYPE_SEI_CONNECT);
                 return _context3.abrupt('return', request(msg));
 
-              case 3:
+              case 2:
               case 'end':
                 return _context3.stop();
             }
@@ -65241,9 +65239,8 @@ var GateSeiWallet = function () {
       return connect;
     }()
   }, {
-    key: 'signArbitray',
-    value: function signArbitray(chainId, signer, message) {
-      console.log("signArbitray: ", chainId);
+    key: 'signArbitrary',
+    value: function signArbitrary(chainId, signer, message) {
       var info = {
         "chainId": chainId,
         "signer": signer,
@@ -65255,7 +65252,6 @@ var GateSeiWallet = function () {
   }, {
     key: 'getOfflineSignerAuto',
     value: function getOfflineSignerAuto(chainId) {
-      console.log("getOfflineSignerAuto: ", chainId);
       return {
         getAccounts: function () {
           var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
@@ -65362,11 +65358,10 @@ var GateSeiWallet = function () {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                console.log("disable: ", chainId);
                 msg = createMessage(chainId, MESSAGE_TYPE_SEI_DISABLE);
                 return _context7.abrupt('return', request(msg));
 
-              case 3:
+              case 2:
               case 'end':
                 return _context7.stop();
             }
@@ -65380,6 +65375,11 @@ var GateSeiWallet = function () {
 
       return disable;
     }()
+  }, {
+    key: 'isMobileSupported',
+    get: function get() {
+      return true;
+    }
   }, {
     key: 'walletInfo',
     get: function get() {

@@ -380,12 +380,17 @@ if(!window['suiWallet']) {
 // sei-js/ packages/core/src/lib/wallet/connect.ts
 const MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
 const MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
-const MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitray";
+const MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitrary";
 const MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
 const MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
 const MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
 
 class GateSeiWallet  {
+
+  get isMobileSupported() {
+    return true
+  }
+
   get walletInfo() {
     return {
       windowKey: 'keplr',
@@ -395,20 +400,18 @@ class GateSeiWallet  {
     }
   }
 
+
   async getAccounts(chainId)  {
-    console.log("getAccounts: ", chainId)
     var msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS)
     return request(msg);
   }
 
   async connect(chainId) {
-    console.log("connect: ", chainId)
     var msg = createMessage(chainId, MESSAGE_TYPE_SEI_CONNECT)
     return request(msg);
   }
 
-  signArbitray(chainId, signer, message) {
-    console.log("signArbitray: ", chainId)
+  signArbitrary(chainId, signer, message) {
     var info = {
       "chainId": chainId,
       "signer": signer,
@@ -419,7 +422,6 @@ class GateSeiWallet  {
   }
 
   getOfflineSignerAuto(chainId) {
-    console.log("getOfflineSignerAuto: ", chainId)
     return {
       async getAccounts() {
         var msg = createMessage(chainId, MESSAGE_TYPE_SEI_GET_ACCOUNTS)
@@ -450,7 +452,6 @@ class GateSeiWallet  {
   }
 
   async disable(chainId) {
-    console.log("disable: ", chainId)
     var msg = createMessage(chainId, MESSAGE_TYPE_SEI_DISABLE)
     return request(msg);
   }
