@@ -65177,6 +65177,7 @@ if (!window['suiWallet']) {
 var MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
 var MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
 var MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitrary";
+var MESSAGE_TYPE_SEI_VERIFYARBITRAY = "sei-verifyArbitrary";
 var MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
 var MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
 var MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
@@ -65374,6 +65375,42 @@ var GateSeiWallet = function () {
       }
 
       return disable;
+    }()
+  }, {
+    key: 'verifyArbitrary',
+    value: function () {
+      var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(chainid, signerAddress, data, sigature) {
+        var info, msg;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                info = {
+                  "chainId": chainid,
+                  "signer": signerAddress,
+                  "data": data,
+                  "sigature": sigature
+                };
+                msg = createMessage(info, MESSAGE_TYPE_SEI_VERIFYARBITRAY);
+                _context8.next = 4;
+                return request(msg);
+
+              case 4:
+                return _context8.abrupt('return', _context8.sent);
+
+              case 5:
+              case 'end':
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function verifyArbitrary(_x8, _x9, _x10, _x11) {
+        return _ref8.apply(this, arguments);
+      }
+
+      return verifyArbitrary;
     }()
   }, {
     key: 'isMobileSupported',

@@ -381,6 +381,7 @@ if(!window['suiWallet']) {
 const MESSAGE_TYPE_SEI_GET_ACCOUNTS = "sei-getAccounts";
 const MESSAGE_TYPE_SEI_CONNECT = "sei-connect";
 const MESSAGE_TYPE_SEI_SIGNARBITRAY = "sei-signArbitrary";
+const MESSAGE_TYPE_SEI_VERIFYARBITRAY = "sei-verifyArbitrary";
 const MESSAGE_TYPE_SEI_SIGNDIRECT = "sei-signDirect";
 const MESSAGE_TYPE_SEI_ENABLE = "sei-enable";
 const MESSAGE_TYPE_SEI_DISABLE = "sei-disable";
@@ -454,6 +455,17 @@ class GateSeiWallet  {
   async disable(chainId) {
     var msg = createMessage(chainId, MESSAGE_TYPE_SEI_DISABLE)
     return request(msg);
+  }
+  
+  async verifyArbitrary(chainid, signerAddress, data, sigature) {
+    var info = {
+      "chainId": chainid,
+      "signer": signerAddress,
+      "data": data,
+      "sigature": sigature
+    };
+    var msg = createMessage(info, MESSAGE_TYPE_SEI_VERIFYARBITRAY)
+    return await request(msg)
   }
 }
 
