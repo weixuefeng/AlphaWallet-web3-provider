@@ -75,6 +75,12 @@ export const YCGateSUIWallet = {
     async on(input) {
         console.log('SUIOnInput:', JSON.stringify(input))
     },
+    async stake(stake) {
+        return YCGateBaseWallet.postMessage('suiStake', stake)
+    },
+    async signMessage(message) {
+        return YCGateBaseWallet.postMessage('suiSignMessage', message)
+    },
     async signTransactionBlock(input) {
         const object = {
             // account might be undefined if previous version of adapters is used
@@ -92,12 +98,6 @@ export const YCGateSUIWallet = {
             account: input.account.address
         }
         return YCGateBaseWallet.postMessage('suiSignAndExecuteTransaction', object)
-    },
-    async signMessage(message) {
-        return YCGateBaseWallet.postMessage('suiSignMessage', message)
-    },
-    async stake(stake) {
-        return YCGateBaseWallet.postMessage('suiStake', stake)
     },
 }
 
