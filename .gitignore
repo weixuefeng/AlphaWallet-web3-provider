@@ -12,3 +12,4 @@ staging/
 .idea
 web3_gate_wallet-min.js
 web3_gate_wallet.js
+*.sh
