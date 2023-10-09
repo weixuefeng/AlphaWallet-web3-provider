@@ -1,6 +1,6 @@
 {
   "name": "web3_gate_wallet",
-  "version": "1.7.3",
+  "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

@@ -55,16 +55,15 @@ export const YCGateSEIWallet = {
         }
         return YCGateBaseWallet.postMessage('seiSignArbitrary', object)
     },
-
-    async verifyArbitrary(chainid, signerAddress, data, sigature) {
-        var object = {
-          "chainId": chainid,
-          "signer": signerAddress,
-          "data": data,
-          "sigature": sigature
-        };
+    async verifyArbitrary(chainId, signer, data, signature) {
+        const object = {
+            chainId,
+            signer,
+            data,
+            signature,
+        }
         return YCGateBaseWallet.postMessage('seiVerifyArbitrary', object)
-      }
+    }
 }
 
 if (context.keplr == undefined) {
