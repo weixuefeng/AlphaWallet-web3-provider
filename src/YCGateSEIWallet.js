@@ -6,6 +6,7 @@ export const YCGateSEIWallet = {
     get isMobileSupported() {
         return true
     },
+    mode: "mobile-web",
     get walletInfo() {
         return {
             windowKey: 'keplr',
@@ -27,6 +28,10 @@ export const YCGateSEIWallet = {
     },
     async getAccounts(chainId) {
         return YCGateBaseWallet.postMessage('seiGetAccounts', chainId)
+    },
+    async experimentalSuggestChain(chainInfo) {
+        // todo
+        console.log("experimentalSuggestChain:", JSON.stringify(chainInfo))
     },
     getOfflineSignerAuto(chainId) {
         return {
