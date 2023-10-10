@@ -9,7 +9,7 @@ export const YCGateSEIWallet = {
     mode: "mobile-web",
     get walletInfo() {
         return {
-            windowKey: 'keplr',
+            windowKey: 'leap',
             name: 'Gate Wallet',
             website: 'https://gate.io',
             icon: 'https://www.gate.io/images/logo/open_sesame_light.png?v=4',
@@ -26,8 +26,17 @@ export const YCGateSEIWallet = {
     async connect(chainId) {
         return YCGateBaseWallet.postMessage('seiConnect', chainId)
     },
+    async isConnected(chainId) {
+        return true;
+    },
+    async getKey(chainId) {
+        return YCGateBaseWallet.postMessage('seiGetKey', chainId)
+    },
+    async disconnect(chainId) {
+        return true;
+    },
     async getAccounts(chainId) {
-        return YCGateBaseWallet.postMessage('seiGetAccounts', chainId)
+        return YCGateBaseWallet.postMessage('seiGetAccounts', chainId);
     },
     async experimentalSuggestChain(chainInfo) {
         // todo
@@ -63,11 +72,25 @@ export const YCGateSEIWallet = {
             signature,
         }
         return YCGateBaseWallet.postMessage('seiVerifyArbitrary', object)
+    },
+    async reconnectWallet(chainId) {
+        return YCGateBaseWallet.postMessage('seiConnect', chainId)
+    },
+    async getEnigmaUtils(chainId){
+        return this.getOfflineSignerAuto(chainId)
+    },
+    async getOfflineSignerOnlyAmino(chainId) {
+        return this.getOfflineSignerAuto(chainId)
+    },
+    async getOfflineSigner(chainId) {
+        return this.getOfflineSignerAuto(chainId)
     }
 }
 
-if (context.keplr == undefined) {
-    context.keplr = YCGateSEIWallet
+if (context.leap == undefined) {
+    context.leap = YCGateSEIWallet
+    context.wallet = context.leap
+    window.addEventListener('leap_keystorechange', YCGateSEIWallet.reconnectWallet)
 }
 
 export default {
