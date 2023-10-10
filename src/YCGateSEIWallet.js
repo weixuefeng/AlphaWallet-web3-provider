@@ -13,48 +13,48 @@ export const YCGateSEIWallet = {
             icon: 'https://www.gate.io/images/logo/open_sesame_light.png?v=4',
         }
     },
-    async enable(chainId) {
-        const resultDic = await YCGateBaseWallet.postMessage('seiEnable', chainId)
+    async enable(chainID) {
+        const resultDic = await YCGateBaseWallet.postMessage('seiEnable', chainID)
         return resultDic['isEnable']
     },
-    async disable(chainId) {
-        const resultDic = await YCGateBaseWallet.postMessage('seiDisable', chainId)
+    async disable(chainID) {
+        const resultDic = await YCGateBaseWallet.postMessage('seiDisable', chainID)
         return resultDic['isDisable']
     },
-    async isConnected(chainId) {
+    async isConnected(chainID) {
         return true
     },
-    async disconnect(chainId) {
+    async disconnect(chainID) {
         return true
     },
     async experimentalSuggestChain(chainInfo) {
-        console.log('experimentalSuggestChain:', JSON.stringify(chainInfo))
+        //console.log('experimentalSuggestChain:', JSON.stringify(chainInfo))
     },
-    async getKey(chainId) {
-        return YCGateBaseWallet.postMessage('seiGetKey', chainId)
+    async getKey(chainID) {
+        return YCGateBaseWallet.postMessage('seiGetKey', chainID)
     },
-    async getAccounts(chainId) {
-        return YCGateBaseWallet.postMessage('seiGetAccounts', chainId)
+    async getAccounts(chainID) {
+        return YCGateBaseWallet.postMessage('seiGetAccounts', chainID)
     },
-    async connect(chainId) {
-        return YCGateBaseWallet.postMessage('seiConnect', chainId)
+    async connect(chainID) {
+        return YCGateBaseWallet.postMessage('seiConnect', chainID)
     },
-    async reconnectWallet(chainId) {
-        return YCGateBaseWallet.postMessage('seiConnect', chainId)
+    async reconnectWallet(chainID) {
+        return YCGateBaseWallet.postMessage('seiConnect', chainID)
     },
-    async getEnigmaUtils(chainId) {
-        return this.getOfflineSignerAuto(chainId)
+    async getEnigmaUtils(chainID) {
+        return this.getOfflineSignerAuto(chainID)
     },
-    async getOfflineSignerOnlyAmino(chainId) {
-        return this.getOfflineSignerAuto(chainId)
+    async getOfflineSignerOnlyAmino(chainID) {
+        return this.getOfflineSignerAuto(chainID)
     },
-    async getOfflineSigner(chainId) {
-        return this.getOfflineSignerAuto(chainId)
+    async getOfflineSigner(chainID) {
+        return this.getOfflineSignerAuto(chainID)
     },
-    getOfflineSignerAuto(chainId) {
+    getOfflineSignerAuto(chainID) {
         return {
             async getAccounts() {
-                return YCGateBaseWallet.postMessage('seiGetAccounts', chainId)
+                return YCGateBaseWallet.postMessage('seiGetAccounts', chainID)
             },
             async signDirect(signerAddress, signDoc) {
                 const object = {
@@ -65,17 +65,17 @@ export const YCGateSEIWallet = {
             }
         }
     },
-    async signArbitrary(chainId, signer, message) {
+    async signArbitrary(chainID, signer, message) {
         const object = {
-            chainId,
+            chainID,
             signer,
             message,
         }
         return YCGateBaseWallet.postMessage('seiSignArbitrary', object)
     },
-    async verifyArbitrary(chainId, signer, data, signature) {
+    async verifyArbitrary(chainID, signer, data, signature) {
         const object = {
-            chainId,
+            chainID,
             signer,
             data,
             signature,
