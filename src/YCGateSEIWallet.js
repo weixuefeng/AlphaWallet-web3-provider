@@ -21,23 +21,35 @@ export const YCGateSEIWallet = {
         const resultDic = await YCGateBaseWallet.postMessage('seiDisable', chainId)
         return resultDic['isDisable']
     },
-    async connect(chainId) {
-        return YCGateBaseWallet.postMessage('seiConnect', chainId)
-    },
     async isConnected(chainId) {
-        return true;
+        return true
+    },
+    async disconnect(chainId) {
+        return true
+    },
+    async experimentalSuggestChain(chainInfo) {
+        console.log('experimentalSuggestChain:', JSON.stringify(chainInfo))
     },
     async getKey(chainId) {
         return YCGateBaseWallet.postMessage('seiGetKey', chainId)
     },
-    async disconnect(chainId) {
-        return true;
-    },
     async getAccounts(chainId) {
-        return YCGateBaseWallet.postMessage('seiGetAccounts', chainId);
+        return YCGateBaseWallet.postMessage('seiGetAccounts', chainId)
     },
-    async experimentalSuggestChain(chainInfo) {
-        console.log('experimentalSuggestChain:', JSON.stringify(chainInfo))
+    async connect(chainId) {
+        return YCGateBaseWallet.postMessage('seiConnect', chainId)
+    },
+    async reconnectWallet(chainId) {
+        return YCGateBaseWallet.postMessage('seiConnect', chainId)
+    },
+    async getEnigmaUtils(chainId) {
+        return this.getOfflineSignerAuto(chainId)
+    },
+    async getOfflineSignerOnlyAmino(chainId) {
+        return this.getOfflineSignerAuto(chainId)
+    },
+    async getOfflineSigner(chainId) {
+        return this.getOfflineSignerAuto(chainId)
     },
     getOfflineSignerAuto(chainId) {
         return {
@@ -70,24 +82,12 @@ export const YCGateSEIWallet = {
         }
         return YCGateBaseWallet.postMessage('seiVerifyArbitrary', object)
     },
-    async reconnectWallet(chainId) {
-        return YCGateBaseWallet.postMessage('seiConnect', chainId)
-    },
-    async getEnigmaUtils(chainId){
-        return this.getOfflineSignerAuto(chainId)
-    },
-    async getOfflineSignerOnlyAmino(chainId) {
-        return this.getOfflineSignerAuto(chainId)
-    },
-    async getOfflineSigner(chainId) {
-        return this.getOfflineSignerAuto(chainId)
-    }
 }
 
 if (context.leap == undefined) {
     context.leap = YCGateSEIWallet
-    context.wallet = context.leap
-    window.addEventListener('leap_keystorechange', YCGateSEIWallet.reconnectWallet)
+    context.wallet = YCGateSEIWallet
+    context.addEventListener('leap_keystorechange', YCGateSEIWallet.reconnectWallet)
 }
 
 export default {
