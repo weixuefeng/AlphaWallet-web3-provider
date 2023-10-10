@@ -142,7 +142,7 @@ ProviderEngine.prototype.sendAsync = function (payload, cb) {
 				this.sendAsyncOriginal(payload2, cb)
 			}
 	}
-};
+}
 
 ProviderEngine.prototype.request = function (payload) {
 	return new Promise((resolve, reject) => {

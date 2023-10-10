@@ -3,10 +3,8 @@ import { YCGateBaseWallet } from './YCGateBaseWallet'
 const context = window || global
 
 export const YCGateSEIWallet = {
-    get isMobileSupported() {
-        return true
-    },
-    mode: "mobile-web",
+    isMobileSupported: true,
+    mode: 'mobile-web',
     get walletInfo() {
         return {
             windowKey: 'leap',
@@ -39,8 +37,7 @@ export const YCGateSEIWallet = {
         return YCGateBaseWallet.postMessage('seiGetAccounts', chainId);
     },
     async experimentalSuggestChain(chainInfo) {
-        // todo
-        console.log("experimentalSuggestChain:", JSON.stringify(chainInfo))
+        console.log('experimentalSuggestChain:', JSON.stringify(chainInfo))
     },
     getOfflineSignerAuto(chainId) {
         return {
