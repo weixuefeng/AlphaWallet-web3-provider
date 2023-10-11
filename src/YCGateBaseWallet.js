@@ -47,13 +47,13 @@ export const YCGateBaseWallet = {
             'object': object,
         }
         if (window.flutter_inappwebview) {
-            console.log('Flutter浏览器')
+            //console.log('Flutter浏览器')
             window.flutter_inappwebview.callHandler('web3Message', params)
         } else if (window.webkit) {
-            console.log('iOS浏览器')
+            //console.log('iOS浏览器')
             window.webkit.messageHandlers.web3Message.postMessage(params)
         } else if (window.gateio) {
-            console.log('android浏览器')
+            //console.log('android浏览器')
             window.gateio.web3Message(params)
         }
     },

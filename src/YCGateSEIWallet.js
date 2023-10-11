@@ -56,22 +56,14 @@ export const YCGateSEIWallet = {
             async getAccounts() {
                 return YCGateBaseWallet.postMessage('seiGetAccounts', chainID)
             },
-            async signDirect(signerAddress, signDoc) {
+            async signDirect(signer, signDoc) {
                 const object = {
-                    signerAddress,
+                    signer,
                     signDoc,
                 }
                 return YCGateBaseWallet.postMessage('seiSignDirect', object)
             }
         }
-    },
-    async signArbitrary(chainID, signer, message) {
-        const object = {
-            chainID,
-            signer,
-            message,
-        }
-        return YCGateBaseWallet.postMessage('seiSignArbitrary', object)
     },
     async verifyArbitrary(chainID, signer, data, signature) {
         const object = {
@@ -81,6 +73,14 @@ export const YCGateSEIWallet = {
             signature,
         }
         return YCGateBaseWallet.postMessage('seiVerifyArbitrary', object)
+    },
+    async signArbitrary(chainID, signer, message) {
+        const object = {
+            chainID,
+            signer,
+            message,
+        }
+        return YCGateBaseWallet.postMessage('seiSignArbitrary', object)
     },
 }
 
