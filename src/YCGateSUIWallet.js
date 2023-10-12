@@ -57,7 +57,7 @@ export const YCGateSUIWallet = {
         }
     },
     async stake(stake) {
-        return YCGateBaseWallet.postMessage('suiStake', stake)
+        //return YCGateBaseWallet.postMessage('suiStake', stake)
     },
     async connect(input) {
         if (YCGateSUIWallet.connecting || YCGateSUIWallet.connected) {
@@ -90,7 +90,7 @@ export const YCGateSUIWallet = {
         }
     },
     async qredoConnect(input) {
-        return YCGateBaseWallet.postMessage('suiQRedoConnect', input)
+        //return YCGateBaseWallet.postMessage('suiQRedoConnect', input)
     },
     async disconnect() {
         YCGateSUIWallet.accounts = []
