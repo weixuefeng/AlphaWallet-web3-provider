@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "ci": "npm run lint && npm run cover",
-    "build": "gulp build"
+    "build": "gulp build",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
@@ -29,6 +30,7 @@
     "@mysten/wallet-standard": "^0.8.0",
     "babel-core": "^6.26.0",
     "mitt": "^3.0.1",
+    "patch-package": "^8.0.0",
     "regenerator-runtime": "^0.14.0",
     "uuid": "^9.0.1",
     "web3": "0.20.6",
