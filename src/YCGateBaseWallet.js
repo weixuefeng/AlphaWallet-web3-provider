@@ -17,25 +17,25 @@ export const YCGateBaseWallet = {
         if (callback) {
             try {
                 value = JSON.parse(value);
-            } catch(err) {
-                // do nothind
-            }
+            } catch(error) {}
             callback(error, value)
             delete callbackArr[id]
         }
     },
-    postMessage(methodName, object, cb) {
+    async postMessage(methodName, object, cb) {
         if (cb) {
+            // hooked callback
             const id = this.createIdentity()
             this.addCallback(id, cb)
             this.postMessageToWallet(methodName, id, object)
         }
         else {
+            // custom callback
             return new Promise((resolve, reject) => {
                 const id = this.createIdentity()
                 const cb = (error, value) => {
                     if (error == null) {
-                        resolve(JSON.parse(value))
+                        resolve(value)
                     } else {
                         reject(error)
                     }

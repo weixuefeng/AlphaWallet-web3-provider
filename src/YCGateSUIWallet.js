@@ -71,19 +71,16 @@ export const YCGateSUIWallet = {
                 'suggestTransactions',
             ],
         }
-
         const resultDic = await YCGateBaseWallet.postMessage('suiConnect', object)
         const suiAccountArr = resultDic['accounts']
         for (let i = 0; i < suiAccountArr.length; ++i) {
             suiAccountArr[i].chains = YCGateSUIWallet.chains
             suiAccountArr[i].features = YCGateSUIWallet.features
         }
-
         YCGateSUIWallet.accounts = suiAccountArr
         YCGateSUIWallet.currentAccount = suiAccountArr[0]
         YCGateSUIWallet.connecting = false
         YCGateSUIWallet.connected = true
-
         await YCGateSUIWallet.notifyChanged()
         return {
             accounts: suiAccountArr
