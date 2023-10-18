@@ -1,3 +1,4 @@
+import "@babel/polyfill"
 import * as YCGateBaseWallet from './YCGateBaseWallet'
 import * as YCGateEVMWallet from './YCGateEVMWallet'
 import * as YCGateSUIWallet from './YCGateSUIWallet'

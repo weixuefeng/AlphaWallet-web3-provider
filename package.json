@@ -27,11 +27,11 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "@mysten/wallet-standard": "^0.8.0",
     "babel-core": "^6.26.0",
     "mitt": "^3.0.1",
     "patch-package": "^8.0.0",
-    "regenerator-runtime": "^0.14.0",
     "uuid": "^9.0.1",
     "web3": "0.20.6",
     "web3-provider-engine": "https://github.com/AlphaWallet/provider-engine#alphawallet"

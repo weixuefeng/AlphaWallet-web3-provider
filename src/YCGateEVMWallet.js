@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime'
 const Web3 = require('web3')
 const ProviderEngine = require('web3-provider-engine')
 const HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js')
