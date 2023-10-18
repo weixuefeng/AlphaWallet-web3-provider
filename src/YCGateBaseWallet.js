@@ -15,6 +15,11 @@ export const YCGateBaseWallet = {
     executeCallback(id, error, value) {
         const callback = callbackArr[id]
         if (callback) {
+            try {
+                value = JSON.parse(value);
+            } catch(err) {
+                // do nothind
+            }
             callback(error, value)
             delete callbackArr[id]
         }
