@@ -1,3 +1,6 @@
+import RpcSource from 'web3-provider-engine/subproviders/rpc'
+import { YCGateBaseWallet } from './YCGateBaseWallet'
+
 const Web3 = require('web3')
 const ProviderEngine = require('web3-provider-engine')
 const HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js')
@@ -10,52 +13,57 @@ const context = window || global
 context.chrome = { webstore: true }
 context.Web3 = Web3
 let globalSyncOptions = {}
-let hookedSubProvider
+if(!context.gateEngineContainer || context.gateEngineContainer.length == 0) {
+	context.gateEngineContainer = []
+} 
 
 export const YCGateEVMWallet = {
 	init(rpcUrl, options, syncOptions) {
 		const engine = new ProviderEngine()
 		const web3 = new Web3(engine)
-		context.web3 = web3
 		globalSyncOptions = syncOptions
-
 		engine.addProvider(new CacheSubprovider())
 		engine.addProvider(new SubscriptionsSubprovider())
 		engine.addProvider(new FilterSubprovider())
-		engine.addProvider(hookedSubProvider = new HookedWalletSubprovider(options))
-
-		let username, password
-		let start = rpcUrl.indexOf('://')
-		if (start != -1) {
-			start += 3
-			const end = rpcUrl.indexOf('@', start + 1)
-			if (end != -1) {
-				const credentials = rpcUrl.substring(start, end)
-				let [u, p] = credentials.split(':')
-				username = u
-				password = p
-			}
-		}
-		if (typeof username === 'undefined' || typeof password === 'undefined') {
-			engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(rpcUrl)))
-		} else {
-			engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(rpcUrl, 0, username, password)))
-		}
-
-		engine.on('error', err => console.error(err.stack))
+		engine.addProvider(new HookedWalletSubprovider(options))
+		engine.addProvider(new RpcSource({rpcUrl: rpcUrl}))
+		engine.on('error', err => console.error("gate inject error", err.stack))
 		engine.enable = options.enable
 		engine.chainId = syncOptions.networkVersion
-		//engine.isAlphaWallet = true
 		engine.isGateWallet = true
-		engine.start()
+		// 标识工作引擎 id
+		engine.flag = YCGateBaseWallet.createIdentity()
+		// 保证只启动一个 engine
+		if(context.gateEngineContainer.length == 0) {
+			engine.start()
+			context.web3 = web3
+			context.gateEngineContainer.push(engine)
+		}
 		return engine
 	},
+
+	// 实现一思考：进入界面会启动两个 engine，切换链之后两个 engine 都在运行，需要将原先链的 engine 停止，并且清空
+	// 对于剩下的一个 engine，需要更换 Rpc，将原先 Rpc 从 Provider 中移除，并且置空，再加入新的 RpcSource
+	// 这样的话导致第二个 hooked 不运行, 以上方法没有走通。为什么不重新 inject 就无法切链成功？
+	// 现在实现方案：将所有 engine 中的 rpcSource 的 url 同时替换
+	updateChainInfo(newRpc, newChainId) {
+		if(context.gateEngineContainer.length > 0){
+			for(let i = 0; i < context.gateEngineContainer.length; i++) {
+				var engine = context.gateEngineContainer[i];
+				console.log(`newRpc is ${newRpc} newchainId: ${newChainId} engine:${engine.flag}`);
+				let rpcSource = engine.getProviderByIndex(4)
+				rpcSource.updateRpc(newRpc)
+				globalSyncOptions.networkVersion = newChainId
+			}
+		}
+	}
 }
 
 ProviderEngine.prototype.setHost = function (host) {
 	var length = this._providers.length
 	this._providers[length - 1].provider.host = host
 }
+
 
 ProviderEngine.prototype.send = function (payload) {
 	const self = this
@@ -104,9 +112,9 @@ ProviderEngine.prototype.isConnected = function () {
 	}).result
 }
 
-ProviderEngine.prototype.sendAsyncOriginal = ProviderEngine.prototype.sendAsync
-ProviderEngine.prototype.sendAsync = function (payload, cb) {
+ProviderEngine.prototype._request = function (payload, cb) {
 	switch (payload.method) {
+		case 'web3_clientVersion':
 		case 'net_version':
 			var result = {
 				id: payload.id,
@@ -132,20 +140,21 @@ ProviderEngine.prototype.sendAsync = function (payload, cb) {
 			cb(null, result)
 			break
 		default:
-			//Patch the payload so nodes accept it, to prevent error: "invalid json request"
 			if (payload.id) {
-				this.sendAsyncOriginal(payload, cb)
+				this.sendAsync(payload, cb)
 			} else {
 				var payload2 = payload
 				payload2['id'] = 1
-				this.sendAsyncOriginal(payload2, cb)
+				this.sendAsync(payload2, cb)
 			}
+			break;
 	}
 }
 
+
 ProviderEngine.prototype.request = function (payload) {
 	return new Promise((resolve, reject) => {
-		this.sendAsync(payload, function (error, response) {
+		this._request(payload, function (error, response) {
 			if (error) {
 				reject(error)
 			} else {
