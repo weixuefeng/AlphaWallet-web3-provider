@@ -11,6 +11,5 @@ staging/
 *.lock
 *.sh
 .idea
-package-lock.json
 web3_gate_wallet-min.js
 web3_gate_wallet.js
