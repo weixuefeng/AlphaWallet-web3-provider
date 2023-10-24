@@ -13,9 +13,10 @@ const context = window || global
 context.chrome = { webstore: true }
 context.Web3 = Web3
 let globalSyncOptions = {}
-if(!context.gateEngineContainer || context.gateEngineContainer.length == 0) {
+
+if (!context.gateEngineContainer || context.gateEngineContainer.length == 0) {
 	context.gateEngineContainer = []
-} 
+}
 
 export const YCGateEVMWallet = {
 	init(rpcUrl, options, syncOptions) {
@@ -26,32 +27,31 @@ export const YCGateEVMWallet = {
 		engine.addProvider(new SubscriptionsSubprovider())
 		engine.addProvider(new FilterSubprovider())
 		engine.addProvider(new HookedWalletSubprovider(options))
-		engine.addProvider(new RpcSource({rpcUrl: rpcUrl}))
-		engine.on('error', err => console.error("gate inject error", err.stack))
+		engine.addProvider(new RpcSource({ rpcUrl: rpcUrl }))
+		engine.on('error', err => console.error('gate inject error', err.stack))
 		engine.enable = options.enable
 		engine.chainId = syncOptions.networkVersion
 		engine.isGateWallet = true
-		// 标识工作引擎 id
+		//标识工作引擎ID
 		engine.flag = YCGateBaseWallet.createIdentity()
-		// 保证只启动一个 engine
-		if(context.gateEngineContainer.length == 0) {
+		//保证只启动一个engine
+		if (context.gateEngineContainer.length == 0) {
 			engine.start()
 			context.web3 = web3
 			context.gateEngineContainer.push(engine)
 		}
 		return engine
 	},
-
-	// 实现一思考：进入界面会启动两个 engine，切换链之后两个 engine 都在运行，需要将原先链的 engine 停止，并且清空
-	// 对于剩下的一个 engine，需要更换 Rpc，将原先 Rpc 从 Provider 中移除，并且置空，再加入新的 RpcSource
-	// 这样的话导致第二个 hooked 不运行, 以上方法没有走通。为什么不重新 inject 就无法切链成功？
-	// 现在实现方案：将所有 engine 中的 rpcSource 的 url 同时替换
+	//实现一思考：进入界面会启动两个 engine，切换链之后两个 engine 都在运行，需要将原先链的 engine 停止，并且清空
+	//对于剩下的一个 engine，需要更换 Rpc，将原先 Rpc 从 Provider 中移除，并且置空，再加入新的 RpcSource
+	//这样的话导致第二个 hooked 不运行, 以上方法没有走通。为什么不重新 inject 就无法切链成功？
+	//现在实现方案：将所有 engine 中的 rpcSource 的 url 同时替换
 	updateChainInfo(newRpc, newChainId) {
-		if(context.gateEngineContainer.length > 0){
-			for(let i = 0; i < context.gateEngineContainer.length; i++) {
-				var engine = context.gateEngineContainer[i];
-				console.log(`newRpc is ${newRpc} newchainId: ${newChainId} engine:${engine.flag}`);
-				let rpcSource = engine.getProviderByIndex(4)
+		if (context.gateEngineContainer.length > 0) {
+			for (let i = 0; i < context.gateEngineContainer.length; ++i) {
+				const engine = context.gateEngineContainer[i];
+				console.log(`newRpc is ${newRpc} newchainId: ${newChainId} engine:${engine.flag}`)
+				const rpcSource = engine.getProviderByIndex(4)
 				rpcSource.updateRpc(newRpc)
 				globalSyncOptions.networkVersion = newChainId
 			}
@@ -64,13 +64,12 @@ ProviderEngine.prototype.setHost = function (host) {
 	this._providers[length - 1].provider.host = host
 }
 
-
 ProviderEngine.prototype.send = function (payload) {
 	const self = this
 	let result = null
 	switch (payload.method) {
 		case 'eth_accounts':
-			let address = globalSyncOptions.address
+			const address = globalSyncOptions.address
 			result = address ? [address] : []
 			break
 		case 'eth_coinbase':
@@ -91,9 +90,8 @@ ProviderEngine.prototype.send = function (payload) {
 				result = false
 			}
 			break
-		// throw not-supported Error
 		default:
-			var message = `The GateEVMWallet Web3 object does not support synchronous methods like ${payload.method} without a callback parameter.`
+			const message = `The GateEVMWallet Web3 object does not support synchronous methods like ${payload.method} without a callback parameter.`
 			throw new Error(message)
 	}
 	return {
@@ -147,10 +145,9 @@ ProviderEngine.prototype._request = function (payload, cb) {
 				payload2['id'] = 1
 				this.sendAsync(payload2, cb)
 			}
-			break;
+			break
 	}
 }
-
 
 ProviderEngine.prototype.request = function (payload) {
 	return new Promise((resolve, reject) => {

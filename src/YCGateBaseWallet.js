@@ -24,13 +24,13 @@ export const YCGateBaseWallet = {
     },
     async postMessage(methodName, object, cb) {
         if (cb) {
-            // hooked callback
+            //使用已有的回调
             const id = this.createIdentity()
             this.addCallback(id, cb)
             this.postMessageToWallet(methodName, id, object)
         }
         else {
-            // custom callback
+            //自定义回调
             return new Promise((resolve, reject) => {
                 const id = this.createIdentity()
                 const cb = (error, value) => {
