@@ -9,7 +9,8 @@ staging/
 *.swo
 *.log
 *.lock
+*.sh
 .idea
+package-lock.json
 web3_gate_wallet-min.js
 web3_gate_wallet.js
-*.sh
