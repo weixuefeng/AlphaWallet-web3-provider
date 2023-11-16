@@ -1,12 +1,8 @@
 import "@babel/polyfill/noConflict"
-import * as YCGateBaseWallet from './YCGateBaseWallet'
-import * as YCGateEVMWallet from './YCGateEVMWallet'
-import * as YCGateSUIWallet from './YCGateSUIWallet'
-import * as YCGateSEIWallet from './YCGateSEIWallet'
-
+function hello() {
+    console.log("hello world")
+    return "helloworld"
+}
 export default {
-    YCGateBaseWallet,
-    YCGateEVMWallet,
-    YCGateSUIWallet,
-    YCGateSEIWallet,
+    hello
 }
